@@ -1,0 +1,65 @@
+<body style="background-color:#eee;font-family: Arial, Helvetica, sans-serif;">
+
+<h2>ING ATMs</h2>
+Enter city name <input type="text" name="city" id="city" /> 
+<input type="button" value="Search" onclick="searchCityData()">
+<p id="cityResult"></p>
+
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+	font-family: Arial, Helvetica, sans-serif;
+	padding: 3px;
+}
+
+</style>
+
+<script>
+var obj, dbParam, xmlhttp, myObj, x, txt = "";
+obj = { "table":"customers", "limit":20 };
+dbParam = JSON.stringify(obj);
+xmlhttp = new XMLHttpRequest();
+xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        myObj = JSON.parse(this.responseText);		
+		var length = Object.keys(myObj).length;
+		if(length==0){
+			document.getElementById("cityResult").innerHTML = "Data not found.";
+			return;
+		}
+		txt = "";
+        txt += "<table border='1' style='width:100%'>"
+		txt += "<tr><th>Street</th> <th>Housenumber</th> <th>Postalcode</th> <th>City</th> <th>Lat</th> <th>Lng</th> <th>distance</th> <th>Type</th></tr>"
+        for (x in myObj) {
+            txt += "<tr>"
+			+"<td>" + myObj[x].address.street +"</td>"
+			+"<td>" +myObj[x].address.housenumber +"</td>"
+			+"<td>" +myObj[x].address.postalcode +"</td>"
+			+"<td>" +myObj[x].address.city +"</td>"
+			+"<td>" +myObj[x].address.geoLocation.lat +"</td>"
+			+"<td>" +myObj[x].address.geoLocation.lng +"</td>"
+			+"<td>" +myObj[x].distance +"</td>"
+			+"<td>" +myObj[x].type +"</td>"
+			"</tr>";
+        }
+        txt += "</table>"        
+        document.getElementById("cityResult").innerHTML = txt;
+    }
+};
+//xmlhttp.open("GET", "/SpringRestExample-1.0.0-BUILD-SNAPSHOT/rest/atms", true);
+//xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+//xmlhttp.send("x=" + dbParam);
+
+function searchCityData() {
+    var city = document.getElementById("city").value ;	
+	document.getElementById("cityResult").innerHTML = "Searching data for "+city;
+	xmlhttp.open("GET", "./../rest/atms/"+city, true);
+	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xmlhttp.send("x=" + dbParam);
+}
+
+</script>
+
+</body>
+</html>
